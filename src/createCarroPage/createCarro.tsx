@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Text, ScrollView, TextInput, View, StyleSheet, Alert } from "react-native";
-import { getdb } from "../../Conf/ConnectionInstance";
-import { inserirCarro } from "../../Conf/Banco";
+import { createCar } from "../../Conf/services/carService";
 import type { Carro } from "../../types/carro";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../css/styles";
@@ -13,42 +12,38 @@ export default function CreateCarro() {
   const [ano, setAno] = useState("");
   const [cor, setCor] = useState("");
   const [preco, setPreco] = useState("");
-  const [kmRodados, setKmRodados] = useState("");
+  const [km_rodados, setKmRodados] = useState("");
 
   const navigation = useNavigation<any>(); 
 
   const handleSubmit = async () => {
-    console.log("Cadastrando carro:", { nome, marca, ano, cor, preco, kmRodados });
-    if (!nome || !marca || !ano || !cor || !preco || !kmRodados) {
+    if (!nome || !marca || !ano || !cor || !preco || !km_rodados) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }else{
     const carro: Carro = {
-      ID_CARRO: 0,
-      NOME: nome,
-      MARCA: marca,
-      ANO: parseInt(ano),
-      COR: cor,
-      PRECO: parseFloat(preco),
-      KM_RODADOS: parseInt(kmRodados),
+      nome: nome,
+      marca: marca,
+      ano: parseInt(ano),
+      cor: cor,
+      preco: parseFloat(preco),
+      km_rodado: parseInt(km_rodados),
     };
 
     try {
-      const db = await getdb();
-      if (db) {
-            const response = await inserirCarro(db, carro);
-            if(response.success) {
-              Alert.alert("Sucesso", "Carro inserido com sucesso!");
-              setNome("");
-              setMarca("");
-              setAno("");
-              setCor("");
-              setPreco("");
-              setKmRodados("");
+      const response = await createCar(carro);
+        if(response.success) {
+          Alert.alert("Sucesso", "Carro inserido com sucesso!");
+          setNome("");
+          setMarca("");
+          setAno("");
+          setCor("");
+          setPreco("");
+          setKmRodados("");
 
-              navigation.navigate("Listar Carros");
-            }
-      }
+          navigation.navigate("Listar Carros");
+        }
+      
     } catch (error) {
       console.error("Erro ao inserir carro:", error);
       Alert.alert("Erro", "Não foi possível inserir o carro.");
@@ -98,7 +93,7 @@ export default function CreateCarro() {
       <Text style={styles.label}>KM Rodados</Text>
       <TextInput
         style={styles.input}
-        value={kmRodados}
+        value={km_rodados}
         onChangeText={setKmRodados}
         placeholder="Ex: 15000"
         keyboardType="numeric"

@@ -1,8 +1,7 @@
 import { useFocusEffect } from "@react-navigation/native";
 import React, { useState, useCallback } from "react";
 import { ScrollView, View, Text, StyleSheet, Alert } from "react-native";
-import { selectAllCarros, deleteCarro } from "../../Conf/Banco";
-import { getdb } from "../../Conf/ConnectionInstance";
+import {getCars, deleteCar} from "../../Conf/services/carService"
 import type { Carro } from "../../types/carro";
 import style from "../css/styles";
 import Spinner from "../utils/spinner";
@@ -16,18 +15,13 @@ export default function GetCarros() {
   const fetchApiCarros = async () => {
     try {
       setLoading(true);
-      const db = await getdb();
-
-      if (db) {
-        const response = await selectAllCarros(db);
-        if (response.success && response.data) {
-          setCarros(response.data);
-        } else {
-          setCarros([]);
-        }
-      }
+        const response = await getCars();
+          if (response.success && response.data) {
+            setCarros(response.data);
+          } else {
+            setCarros([]);
+          }
     } catch (error) {
-      console.log("Erro ao buscar carros", error);
       setCarros([]);
     } finally {
       setLoading(false);
@@ -55,12 +49,9 @@ export default function GetCarros() {
 
   const deletarCarro = async (id: number) => {
     try {
-      const db = await getdb();
-      if (db) {
         if(id >= 0){
-        const response = await deleteCarro(db, id);
+        const response = await deleteCar(id);
         if (response.success) {
-          console.log("deletando");
           Alert.alert("Sucesso", "Carro excluído com sucesso!");
           fetchApiCarros();
         } else {
@@ -68,7 +59,6 @@ export default function GetCarros() {
         }
       }else{
       Alert.alert("Id não fornecido um mal formatado")
-    }
     }
     } catch (error) {
       console.error("Erro ao excluir carro:", error);
@@ -93,26 +83,26 @@ export default function GetCarros() {
   return (
     <ScrollView contentContainerStyle={style.scrollContainer}>
       {carros.map((carro) => (
-        <View key={carro.ID_CARRO} style={style.card}>
-          <Text style={style.nome}>{carro.NOME}</Text>
+        <View key={carro.id} style={style.card}>
+          <Text style={style.nome}>{carro.nome}</Text>
         <View style={style.CardDelete}>
            
           <View>
-          <Text style={style.info}>Marca: {carro.MARCA}</Text>
-          <Text style={style.info}>Ano: {carro.ANO}</Text>
+          <Text style={style.info}>Marca: {carro.marca}</Text>
+          <Text style={style.info}>Ano: {carro.ano}</Text>
       
           </View>
           <View> 
           <Text style={style.info}>
-            Preço: R$ {carro.PRECO}
+            Preço: R$ {carro.preco}
           </Text>
           <Text style={style.info}>
-            KM Rodados: {carro.KM_RODADOS} km
+            KM Rodados: {carro.km_rodado} km
           </Text>
           </View>
         </View>
           <View>
-            <Button style={style.buttonDelete} icon="delete" mode="contained" onPress={() => confirmarExclusao(carro.ID_CARRO)}>
+            <Button style={style.buttonDelete} icon="delete" mode="contained" onPress={() => confirmarExclusao(carro.id || 0)}>
               Excluir
             </Button>
           </View>

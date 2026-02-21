@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Text, ScrollView, TextInput, View, StyleSheet, Alert } from "react-native";
-import { getdb } from "../../Conf/ConnectionInstance";
-import { updateUsuario, selectCarroId } from "../../Conf/Banco";
+import { getCarById, updateCar } from "../../Conf/services/carService";
 import type { Carro } from "../../types/carro";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import styles from "../css/styles";
@@ -23,23 +22,20 @@ export default function CreateCarro() {
 
     const getCarrosInfo = async (id: number) => {
   try {
-    const db = await getdb();
-    if (db) {
-      const response = await selectCarroId(db, id);
+      const response = await getCarById(id);
       if (response.success && response.data) {
         const carroEncontrado = response.data;
         setCarro(carroEncontrado); 
-        setNome(carroEncontrado.NOME);
-        setMarca(carroEncontrado.MARCA);
-        setAno(carroEncontrado.ANO.toString());
-        setCor(carroEncontrado.COR);
-        setPreco(carroEncontrado.PRECO.toString());
-        setKmRodados(carroEncontrado.KM_RODADOS.toString());
+        setNome(carroEncontrado.nome);
+        setMarca(carroEncontrado.marca);
+        setAno(carroEncontrado.ano.toString());
+        setCor(carroEncontrado.cor);
+        setPreco(carroEncontrado.preco.toString());
+        setKmRodados(carroEncontrado.km_rodado.toString());
       } else {
         setCarro({} as Carro);
         Alert.alert("Atenção", "Nenhum carro encontrado com esse ID.");
       }
-    }
   } catch (error) {
     console.error("Erro ao obter informações dos carros:", error);
     Alert.alert("Erro", "Não foi possível obter as informações do carro.");
@@ -48,36 +44,31 @@ export default function CreateCarro() {
 
 
   const handleSubmit = async () => {
-    console.log("Cadastrando carro:", carro);
     if (!nome || !marca || !ano || !cor || !preco || !kmRodados) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
     try {
-      const db = await getdb();
-      if (db) {
-                const carro: Carro = {
-                ID_CARRO: 0,
-                NOME: nome,
-                MARCA: marca,
-                ANO: parseInt(ano),
-                COR: cor,
-                PRECO: parseFloat(preco),
-                KM_RODADOS: parseInt(kmRodados),
-                };
-            const response = await updateUsuario(db,Number(idPesquisar), carro);
-            if(response.success) {
-              Alert.alert("Sucesso", "Carro editado com sucesso!");
-                setIdPesquisar("");
-              setNome("");
-              setMarca("");
-              setAno("");
-              setCor("");
-              setPreco("");
-              setKmRodados("");
+          const carro: Carro = {
+          nome: nome,
+          marca: marca,
+          ano: parseInt(ano),
+          cor: cor,
+          preco: parseFloat(preco),
+          km_rodado: parseInt(kmRodados),
+          };
+      const response = await updateCar(Number(idPesquisar), carro);
+      if(response.success) {
+        Alert.alert("Sucesso", "Carro editado com sucesso!");
+          setIdPesquisar("");
+        setNome("");
+        setMarca("");
+        setAno("");
+        setCor("");
+        setPreco("");
+        setKmRodados("");
 
-              navigation.navigate("Listar Carros");
-            }
+        navigation.navigate("Listar Carros");
       }
     } catch (error) {
       console.error("Erro ao inserir carro:", error);
@@ -99,11 +90,9 @@ export default function CreateCarro() {
       useCallback(() => {
         const idFromRoute = (route.params as { id?: number })?.id;
         if (idFromRoute) {
-          console.log("ID recebido pela rota:", idFromRoute);
           getCarrosInfo(idFromRoute);
           setIdPesquisar(idFromRoute.toString());
         } else {
-          console.log("Nenhum ID recebido pela rota. Usuário deve digitar manualmente.");
           clearForm();
         }
       }, [route.params])

@@ -3,8 +3,7 @@ import React, { useState, useCallback } from "react";
 import { ScrollView, View, Text, StyleSheet, Modal, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Button } from "react-native-paper";
-import { selectAllCarros } from "../../Conf/Banco";
-import { getdb } from "../../Conf/ConnectionInstance";
+import { getCars } from "../../Conf/services/carService";
 import type { Carro } from "../../types/carro";
 import Spinner from "../utils/spinner";
 
@@ -20,18 +19,13 @@ export default function GetCarros() {
   const fetchApiCarros = async () => {
     try {
       setLoading(true);
-      const db = await getdb();
-
-      if (db) {
-        const response = await selectAllCarros(db);
-        if (response.success && response.data) {
-          setCarros(response.data);
-        } else {
-          setCarros([]);
-        }
+      const response = await getCars();
+      if (response.success && response.data) {
+        setCarros(response.data);
+      } else {
+        setCarros([]);
       }
     } catch (error) {
-      console.log("Erro ao buscar carros", error);
       setCarros([]);
     } finally {
       setLoading(false);
@@ -66,15 +60,15 @@ export default function GetCarros() {
     <>
       <ScrollView contentContainerStyle={cardStyles.scrollContainer}>
         {carros.map((carro) => (
-          <View key={carro.ID_CARRO} style={cardStyles.card}>
-            <Text style={cardStyles.nome}>{carro.NOME}</Text>
-            <Text style={cardStyles.info}>Id: {carro.ID_CARRO}</Text>
-            <Text style={cardStyles.info}>Marca: {carro.MARCA}</Text>
-            <Text style={cardStyles.info}>Ano: {carro.ANO}</Text>
-            <Text style={cardStyles.info}>Cor: {carro.COR}</Text>
-            <Text style={cardStyles.info}>Preço: R$ {carro.PRECO}</Text>
+          <View key={carro.id} style={cardStyles.card}>
+            <Text style={cardStyles.nome}>{carro.nome}</Text>
+            <Text style={cardStyles.info}>Id: {carro.id}</Text>
+            <Text style={cardStyles.info}>Marca: {carro.marca}</Text>
+            <Text style={cardStyles.info}>Ano: {carro.ano}</Text>
+            <Text style={cardStyles.info}>Cor: {carro.cor}</Text>
+            <Text style={cardStyles.info}>Preço: R$ {carro.preco}</Text>
             <Text style={cardStyles.info}>
-              KM Rodados: {carro.KM_RODADOS} km
+              KM Rodados: {carro.km_rodado} km
             </Text>
           <View style={{ flexDirection: "row" }}>
             <Button
@@ -89,7 +83,7 @@ export default function GetCarros() {
               style={{ marginTop: 10, width: "49%", backgroundColor:"#e91e63ff" }}
               icon="eye"
               mode="contained"
-              onPress={() => navigation.navigate("Editar Carro", { id: carro.ID_CARRO })}
+              onPress={() => navigation.navigate("Editar Carro", { id: carro.id })}
             >
               Editar
             </Button>
@@ -109,13 +103,13 @@ export default function GetCarros() {
           <View style={modalStyles.content}>
             {selectedCarro && (
               <>
-                <Text style={modalStyles.title}>{selectedCarro.NOME}</Text>
-                <Text>Id: {selectedCarro.ID_CARRO}</Text>
-                <Text>Marca: {selectedCarro.MARCA}</Text>
-                <Text>Ano: {selectedCarro.ANO}</Text>
-                <Text>Cor: {selectedCarro.COR}</Text>
-                <Text>Preço: R$ {selectedCarro.PRECO}</Text>
-                <Text>KM Rodados: {selectedCarro.KM_RODADOS} km</Text>
+                <Text style={modalStyles.title}>{selectedCarro.nome}</Text>
+                <Text>Id: {selectedCarro.id}</Text>
+                <Text>Marca: {selectedCarro.marca}</Text>
+                <Text>Ano: {selectedCarro.ano}</Text>
+                <Text>Cor: {selectedCarro.cor}</Text>
+                <Text>Preço: R$ {selectedCarro.preco}</Text>
+                <Text>KM Rodados: {selectedCarro.km_rodado} km</Text>
 
                 <Pressable style={modalStyles.closeButton} onPress={fecharModal}>
                   <Text style={{ color: "#fff", fontWeight: "bold" }}>Fechar</Text>

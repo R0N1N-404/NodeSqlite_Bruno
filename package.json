@@ -4,7 +4,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
-    "dev": "yarn start --tunnel",
+    "dev": "npm start --tunnel",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
@@ -14,12 +14,16 @@
     "@react-native-vector-icons/material-design-icons": "^12.0.0",
     "@react-navigation/bottom-tabs": "^7.4.6",
     "@react-navigation/native": "^7.1.17",
-    "expo": "53.0.23",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "expo": "53.0.27",
     "expo-sqlite": "~15.2.14",
     "expo-status-bar": "~2.2.3",
+    "express": "^5.2.1",
+    "pg": "^8.18.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "react-native": "0.79.5",
+    "react-native": "0.79.6",
     "react-native-paper": "^5.14.5",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
@@ -28,6 +32,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@react-native-community/cli": "^20.1.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/pg": "^8.16.0",
     "@types/react": "~19.0.10",
     "@types/react-native-vector-icons": "^6.4.18",
     "typescript": "~5.8.3"

@@ -1,10 +1,10 @@
 export type Carro = {
-  ID_CARRO: number;
-  NOME: string;
-  MARCA: string;
-  ANO: number;
-  COR: string;
-  PRECO: number;
-  KM_RODADOS: number;
+  id?: number;
+  nome: string;
+  marca: string;
+  ano: number;
+  cor: string;
+  preco: number;
+  km_rodado: number;
 }
 
